@@ -1,83 +1,64 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import * as storage from './storage'
+import { supabase } from './config/supabase'
 
-// One hook in App.jsx — state + localStorage together
+// Hook that manages app state with Supabase backend
 export function useStore() {
-  const [users, setUsers] = useState(storage.getUsers())
+  const [users, setUsers] = useState([])
   const [user, setUser] = useState(storage.getLoggedInUser())
-  const [messages, setMessages] = useState(storage.getMessages())
+  const [loading, setLoading] = useState(true)
+
+  // Load users on mount
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  async function loadUsers() {
+    setLoading(true)
+    const fetchedUsers = await storage.getUsers()
+    setUsers(fetchedUsers)
+    setLoading(false)
+  }
 
   function login(email, password) {
-    for (let i = 0; i < users.length; i++) {
-      if (users[i].email === email && users[i].password === password) {
-        const loggedIn = {
-          id: users[i].id,
-          name: users[i].name,
-          email: users[i].email,
-        }
-        storage.saveLoggedInUser(loggedIn)
-        setUser(loggedIn)
-        return true
-      }
-    }
+    // Note: Login is handled in Login.jsx with Supabase
+    // This is kept for compatibility
     return false
   }
 
   function signup(name, email, password) {
-    for (let i = 0; i < users.length; i++) {
-      if (users[i].email === email) {
-        return false
-      }
-    }
-
-    const newUser = {
-      id: String(Date.now()),
-      name,
-      email,
-      password,
-    }
-
-    const newUsers = users.concat(newUser)
-    storage.saveUsers(newUsers)
-    setUsers(newUsers)
-
-    const loggedIn = {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-    }
-    storage.saveLoggedInUser(loggedIn)
-    setUser(loggedIn)
-    return true
+    // Note: Signup is handled in Signup.jsx with Supabase
+    // This is kept for compatibility
+    return false
   }
 
   function logout() {
-    storage.saveLoggedInUser(null);
-    setUser(null);
-
-    // 🔥 hard reset to avoid ghost state
-    window.location.replace("/");
+    storage.saveLoggedInUser(null)
+    setUser(null)
+    // Hard reset to avoid ghost state
+    window.location.replace('/')
   }
 
-  function sendMessage(fromUserId, toUserId, text) {
-    const newMessages = messages.concat({
-      id: String(Date.now()),
-      fromUserId,
-      toUserId,
+  async function sendMessage(fromUserId, toUserId, text, roomId) {
+    const newMessage = {
+      room_id: roomId,
+      sender_id: fromUserId,
       text,
-    })
-    storage.saveMessages(newMessages)
-    setMessages(newMessages)
+    }
+    
+    const result = await storage.saveMessage(newMessage)
+    return result
   }
 
   return {
     users,
     user,
-    messages,
+    loading,
     login,
     signup,
     logout,
     sendMessage,
     setUser,
+    loadUsers,
   }
 }

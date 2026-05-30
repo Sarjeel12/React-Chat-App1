@@ -1,60 +1,84 @@
-// Simple localStorage helpers
+// Supabase storage helpers
+import { supabase } from './config/supabase'
 
 const KEYS = {
-  users: 'chat_users',
   user: 'chat_user',
-  messages: 'chat_messages',
 }
 
-const DEFAULT_USERS = [
-  { id: '1', name: 'Alex', email: 'alex@test.com', password: '123' },
-  { id: '2', name: 'Jordan', email: 'jordan@test.com', password: '123' },
-  { id: '3', name: 'Sam', email: 'sam@test.com', password: '123' },
-]
+// Get all users from Supabase
+export async function getUsers() {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+    
+    if (error) {
+      console.error('Error fetching users:', error)
+      return []
+    }
+    return data || []
+  } catch (err) {
+    console.error('Error in getUsers:', err)
+    return []
+  }
+}
 
-function getItem(key, fallback) {
-  const raw = localStorage.getItem(key)
-  if (!raw) return fallback
+// Get logged-in user from session storage (browser session)
+export function getLoggedInUser() {
+  const raw = localStorage.getItem(KEYS.user)
+  if (!raw) return null
   try {
     return JSON.parse(raw)
   } catch {
-    return fallback
+    return null
   }
 }
 
-function setItem(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
-
-export function getUsers() {
-  const users = getItem(KEYS.users, null)
-  if (!users) {
-    setItem(KEYS.users, DEFAULT_USERS)
-    return DEFAULT_USERS
-  }
-  return users
-}
-
-export function saveUsers(users) {
-  setItem(KEYS.users, users)
-}
-
-export function getLoggedInUser() {
-  return getItem(KEYS.user, null)
-}
-
+// Save logged-in user to session storage after successful auth
 export function saveLoggedInUser(user) {
   if (user) {
-    setItem(KEYS.user, user)
+    localStorage.setItem(KEYS.user, JSON.stringify(user))
   } else {
     localStorage.removeItem(KEYS.user)
   }
 }
 
-export function getMessages() {
-  return getItem(KEYS.messages, [])
+// Get messages from Supabase for a specific room
+export async function getMessages(roomId) {
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('room_id', roomId)
+      .order('created_at', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching messages:', error)
+      return []
+    }
+    return data || []
+  } catch (err) {
+    console.error('Error in getMessages:', err)
+    return []
+  }
 }
 
-export function saveMessages(messages) {
-  setItem(KEYS.messages, messages)
+// Save message to Supabase
+export async function saveMessage(message) {
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert([message])
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error saving message:', error)
+      return null
+    }
+    return data
+  } catch (err) {
+    console.error('Error in saveMessage:', err)
+    return null
+  }
 }

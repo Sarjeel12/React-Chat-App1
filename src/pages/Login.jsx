@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../config/supabase";
-import * as storage from "../storage"; // ✅ ADD THIS
+import * as storage from "../storage"; 
 // import { useEffect } from "react";
 // import * as storage from "../storage";
 // import { useNavigate } from "react-router-dom";
@@ -30,8 +30,7 @@ function Login() {
       .eq("email", email)
       .eq("password", password)
       .maybeSingle();
-
-    // Debug logs removed for production
+      
 
     if (error || !data) {
       setError("Invalid email or password");

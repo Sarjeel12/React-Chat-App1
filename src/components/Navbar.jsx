@@ -20,30 +20,34 @@ function Navbar({ user, onLogout }) {
       <h3 style={{ margin: 0 }}>Chat App</h3>
 
       <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-        <span title={user?.email || "Not logged in"}>
-          {user?.name || "Guest"}
-        </span>
+        {user ? (
+          <>
+            <span title={user?.email || "Not logged in"}>
+              {user?.name}
+            </span>
 
-        <button
-          onClick={handleLogout}
-          title="Sign out of your account"
-          aria-label="Logout button"
-          style={{
-            background: "rgba(255,255,255,0.95)",
-            color: "#7c3aed",
-            border: "none",
-            padding: "6px 12px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "600",
-            transition: "all 0.2s",
-            fontSize: "12px",
-          }}
-          onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
-          onMouseLeave={(e) => (e.target.style.opacity = "1")}
-        >
-          Logout
-        </button>
+            <button
+              onClick={handleLogout}
+              title="Sign out of your account"
+              aria-label="Logout button"
+              style={{
+                background: "rgba(255,255,255,0.95)",
+                color: "#7c3aed",
+                border: "none",
+                padding: "6px 12px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "600",
+                transition: "all 0.2s",
+                fontSize: "12px",
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+              onMouseLeave={(e) => (e.target.style.opacity = "1")}
+            >
+              Logout
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   )

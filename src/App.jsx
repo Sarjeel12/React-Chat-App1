@@ -28,31 +28,35 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Navbar user={store.user} onLogout={store.logout} />
+    <BrowserRouter basename="/React-Chat-App1/">
+      <div className="app-shell">
+        <Navbar user={store.user} onLogout={store.logout} />
 
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute>
+                  <Users />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route
-          path="/chat/:roomId"
-          element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+            <Route
+              path="/chat/:roomId"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   );
 }

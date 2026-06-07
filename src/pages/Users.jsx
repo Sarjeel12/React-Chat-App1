@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../config/supabase";
 import UserCard from "../components/UserCard";
@@ -10,30 +10,8 @@ function Users() {
   const nav = useNavigate();
 
   useEffect(() => {
-    console.log("LOGIN USER UPDATED:", loginUser);
-  }, [loginUser]);
-
-  useEffect(() => {
     getAllUsers();
   }, []);
-
-  // const getAllUsers = async () => {
-  //   const userLogin = JSON.parse(localStorage.getItem("userData"));
-
-  //   if (!userLogin) {
-  //     nav("/");
-  //     return;
-  //   }
-
-  //   setLoginUser(userLogin);
-
-  //   const { data } = await supabase
-  //     .from("users")
-  //     .select("*")
-  //     .neq("id", userLogin.id);
-
-  //   setUsers(data || []);
-  // };
 
   const getAllUsers = async () => {
     const stored = localStorage.getItem("chat_user");
@@ -89,6 +67,13 @@ function Users() {
     nav("/chat/" + room.id);
   };
 
+  const userElements = useMemo(() => 
+    users.map((u) => (
+      <UserCard key={u.id} user={u} onClick={() => createChatRoom(u)} />
+    )),
+    [users]
+  );
+
   return (
     <div className="page">
       <h1 style={{ textAlign: "right" }}>
@@ -105,9 +90,7 @@ function Users() {
           <p>No other users yet.</p>
         </div>
       ) : (
-        users.map((u) => (
-          <UserCard key={u.id} user={u} onClick={() => createChatRoom(u)} />
-        ))
+        userElements
       )}
     </div>
   );

@@ -28,7 +28,7 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter basename="/React-Chat-App1/">
+    <BrowserRouter basename="/">
       <div className="app-shell">
         <Navbar user={store.user} onLogout={store.logout} />
 

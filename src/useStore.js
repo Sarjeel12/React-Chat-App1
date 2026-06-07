@@ -13,6 +13,33 @@ export function useStore() {
     loadUsers()
   }, [])
 
+  // Listen for storage changes (login/logout from other tabs or pages)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'chat_user') {
+        try {
+          const newUser = e.newValue ? JSON.parse(e.newValue) : null
+          setUser(newUser)
+        } catch {
+          setUser(null)
+        }
+      }
+    }
+
+    // Check localStorage periodically to handle same-tab updates
+    const checkStorageInterval = setInterval(() => {
+      const storedUser = storage.getLoggedInUser()
+      setUser(storedUser)
+    }, 1000)
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(checkStorageInterval)
+    }
+  }, [])
+
   async function loadUsers() {
     setLoading(true)
     const fetchedUsers = await storage.getUsers()
